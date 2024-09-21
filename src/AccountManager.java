@@ -18,6 +18,7 @@ public class AccountManager {
         scanner.nextLine();
         System.out.println("Enter Amount: ");
         double amount=scanner.nextDouble();
+        scanner.nextLine();
         System.out.println("Enter Security Pin: ");
         String security_pin=scanner.nextLine();
         try {
@@ -35,7 +36,7 @@ public class AccountManager {
                         PreparedStatement preparedStatement1=connection.prepareStatement(debit_query);
                         preparedStatement1.setDouble(1,amount);
                         preparedStatement1.setLong(2,account_number);
-                        int affected_rows=preparedStatement.executeUpdate();
+                        int affected_rows=preparedStatement1.executeUpdate();
                         if (affected_rows>0){
                             connection.commit();
                             System.out.println("Rs. "+amount+" debited successfully");
@@ -59,11 +60,11 @@ public class AccountManager {
         connection.setAutoCommit(true);
     }
 
-
     public void credit_money(long account_number) throws SQLException {
         scanner.nextLine();
         System.out.println("Enter Amount: ");
         double amount=scanner.nextDouble();
+        scanner.nextLine();
         System.out.println("Enter Security Pin: ");
         String security_pin=scanner.nextLine();
         try {
@@ -75,13 +76,12 @@ public class AccountManager {
                 preparedStatement.setString(2,security_pin);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()){
-                    double current_balance=resultSet.getDouble("balance");
-                    if (resultSet.next()){
+
                         String credit_query="update accounts set balance= balance + ? where account_number=?";
                         PreparedStatement preparedStatement1=connection.prepareStatement(credit_query);
                         preparedStatement1.setDouble(1,amount);
                         preparedStatement1.setLong(2,account_number);
-                        int affected_rows=preparedStatement.executeUpdate();
+                        int affected_rows=preparedStatement1.executeUpdate();
                         if (affected_rows>0){
                             connection.commit();
                             System.out.println("Rs. "+amount+" credited successfully");
@@ -92,9 +92,7 @@ public class AccountManager {
                             connection.rollback();
                             connection.setAutoCommit(true);
                         }
-                    }else {
-                        System.out.println("Insufficient Balance ");
-                    }
+
                 }else {
                     System.out.println("Invalid PIN ");
                 }
@@ -132,14 +130,14 @@ public class AccountManager {
                         PreparedStatement debitPreparedStatement=connection.prepareStatement(debit_query);
                         PreparedStatement creditPreparedStatement=connection.prepareStatement(credit_query);
 
-                        preparedStatement.setDouble(1,amount);
-                        preparedStatement.setLong(2,sender_account_number);
-                        preparedStatement.setDouble(1,amount);
-                        preparedStatement.setLong(2,receiver_account_number);
+                        debitPreparedStatement.setDouble(1,amount);
+                        debitPreparedStatement.setLong(2,sender_account_number);
+                        creditPreparedStatement.setDouble(1,amount);
+                        creditPreparedStatement.setLong(2,receiver_account_number);
 
-                        int affectedRows1=preparedStatement.executeUpdate();
-                        int affectedRows2=preparedStatement.executeUpdate();
-                        if (affectedRows1>0 && affectedRows2>0){
+                        int affectedRows1=debitPreparedStatement.executeUpdate();
+                        int affectedRows2=creditPreparedStatement.executeUpdate();
+                        if (affectedRows1 > 0 && affectedRows2 > 0){
                             connection.commit();
                             System.out.println("Transaction Successful ");
                             System.out.println("Rs. "+amount+ " Transferred Successfully ");
