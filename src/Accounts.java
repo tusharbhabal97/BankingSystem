@@ -82,7 +82,7 @@ public class Accounts {
         try {
             PreparedStatement preparedStatement=connection.prepareStatement(query);
             preparedStatement.setString(1,email);
-            ResultSet resultSet=preparedStatement.getResultSet();
+            ResultSet resultSet=preparedStatement.executeQuery();
             if (resultSet.next()){
                 return true;
             }else {

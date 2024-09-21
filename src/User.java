@@ -52,8 +52,8 @@ public class User {
             PreparedStatement preparedStatement=connection.prepareStatement(query);
             preparedStatement.setString(1,email);
             preparedStatement.setString(2,password);
-            int affectedRows=preparedStatement.executeUpdate();
-            if (affectedRows>0){
+            ResultSet resultSet=preparedStatement.executeQuery();
+            if (resultSet.next()){
                 return email;
             }else {
                 return null;
